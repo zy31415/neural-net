@@ -1,8 +1,9 @@
-import java.awt.image.{BufferedImage, ByteLookupTable, LookupOp, ShortLookupTable}
+import java.awt.image.{BufferedImage, ByteLookupTable, LookupOp}
 
 import mnist.MnistReader
 
 import scala.collection.JavaConverters._
+
 
 object MyMnistReader {
 
@@ -10,15 +11,15 @@ object MyMnistReader {
   def labelPath = getClass.getResource("train-labels-idx1-ubyte").getPath
 
   def numImages = imageData.length
-  def imageHeight = imageData.head.length
-  def imageWidth = imageData.head.head.length
+  def imageHeight = 28
+  def imageWidth = 28
 
-  private var _images: List[Array[Array[Int]]] = _
+  private var _images: List[Array[Int]] = _
   private var _labels: Array[Int] = _
 
-  def imageData: List[Array[Array[Int]]] = {
+  def imageData: List[Array[Int]] = {
     if (_images == null) {
-      _images = MnistReader.getImages(imagePath).asScala.toList
+      _images = MnistReader.getImages(imagePath).asScala.toList.map(_.flatten)
     }
     _images
   }
@@ -38,16 +39,9 @@ object MyMnistReader {
     revertGrayScale(bufferedImage)
   }
 
-  private def setValue(image: BufferedImage, nth: Int) = {
-    var i = 0
-    for {
-      row <- MyMnistReader.imageData(nth)
-      ele <- row
-    } {
+  private def setValue(image: BufferedImage, nth: Int): Unit =
+    for ((ele, i) <- MyMnistReader.imageData(nth).view.zipWithIndex)
       image.getRaster.getDataBuffer.setElem(i, ele)
-      i += 1
-    }
-  }
 
   private def revertGrayScale(image: BufferedImage): BufferedImage =
     new LookupOp(
@@ -55,8 +49,8 @@ object MyMnistReader {
       null)
       .filter(image, null)
 
-  def getImageData(label: Int): List[Array[Array[Int]]] = {
-    var result: List[Array[Array[Int]]] = null
+  def getImageData(label: Int): List[Array[Int]] = {
+    var result: List[Array[Int]] = null
     for((d, l) <- imageData zip labels if l == label)
       result = d :: result
     result
