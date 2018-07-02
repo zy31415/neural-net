@@ -31,16 +31,19 @@ object MyMnistReader {
     _labels
   }
 
-  def images (nth: Int): BufferedImage = {
+  def images (nth: Int): BufferedImage = asBufferedImage(imageData(nth))
+
+  def asBufferedImage(imageData: Array[Int]): BufferedImage = {
     val bufferedImage = new BufferedImage(
       MyMnistReader.imageWidth, MyMnistReader.imageHeight, BufferedImage.TYPE_BYTE_GRAY)
-
-    setValue(bufferedImage, nth)
+    setValue(bufferedImage, imageData)
     revertGrayScale(bufferedImage)
   }
 
-  private def setValue(image: BufferedImage, nth: Int): Unit =
-    for ((ele, i) <- MyMnistReader.imageData(nth).view.zipWithIndex)
+  private def setValue(image: BufferedImage, nth: Int): Unit = setValue(image, imageData(nth))
+
+  private def setValue(image: BufferedImage, imageData: Array[Int]): Unit =
+    for ((ele, i) <- imageData.view.zipWithIndex)
       image.getRaster.getDataBuffer.setElem(i, ele)
 
   private def revertGrayScale(image: BufferedImage): BufferedImage =
@@ -50,7 +53,7 @@ object MyMnistReader {
       .filter(image, null)
 
   def getImageData(label: Int): List[Array[Int]] = {
-    var result: List[Array[Int]] = null
+    var result: List[Array[Int]] = Nil
     for((d, l) <- imageData zip labels if l == label)
       result = d :: result
     result
