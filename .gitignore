@@ -1,0 +1,9 @@
+.idea/
+target/
+*.png
+
+.DS_Store
+
+# MNIST data
+*-images-idx3-ubyte
+*-labels-idx1-ubyte
