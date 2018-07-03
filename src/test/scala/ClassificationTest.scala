@@ -1,10 +1,9 @@
 import java.awt.Color
 import java.awt.geom.{Ellipse2D, Rectangle2D}
-import java.io.File
 import java.nio.file.Paths
 
-import MyMnistReader.getClass
 import javax.imageio.ImageIO
+import mnist.data.MyMnistReader
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.{ChartFactory, ChartUtils}
 import org.jfree.data.xy.{XYSeries, XYSeriesCollection}
@@ -17,8 +16,10 @@ class ClassificationTest extends FunSuite {
 
     val dataset = new XYSeriesCollection()
 
-    addSeries(dataset, images5, "5")
-    addSeries(dataset, images1, "1")
+//    addSeries(dataset, images5, "5")
+//    addSeries(dataset, images1, "1")
+    addSeriesSymmetryRotation(dataset, images5, "5")
+    addSeriesSymmetryRotation(dataset, images1, "1")
 
 
     // Create chart// Create chart
@@ -30,8 +31,8 @@ class ClassificationTest extends FunSuite {
 
     val plot = chart.getPlot.asInstanceOf[XYPlot]
 
-    plot.getDomainAxis.setRange(0, 0.5)
-    plot.getRangeAxis().setRange(-0.5, 0.0)
+    plot.getDomainAxis.setRange(0, 0.4)
+    plot.getRangeAxis().setRange(-0.4, 0.0)
 
     val renderer = plot.getRenderer
 
@@ -47,13 +48,25 @@ class ClassificationTest extends FunSuite {
     renderer.setSeriesShape(1, shape2)
 
     ChartUtils.saveChartAsJPEG(
-      new File("chart.jpg"), chart, 500, 500, null)
-
+      Paths.get("/Users/zy/Documents/workspace/mnist/temp", "chart.jpg").toFile,
+      chart, 500, 500, null)
   }
 
   private def addSeries(dataset: XYSeriesCollection, images: List[Array[Int]], key: String): Unit = {
     val it = images.map(FeatureExtractor.intensity _ )
     val sym = images.map(FeatureExtractor.symmetryHeight _)
+
+    val series1 = new XYSeries(key)
+
+    for ((i, s) <- it zip sym) {
+      series1.add(i, s)
+    }
+    dataset.addSeries(series1)
+  }
+
+  private def addSeriesSymmetryRotation(dataset: XYSeriesCollection, images: List[Array[Int]], key: String): Unit = {
+    val it = images.map(FeatureExtractor.intensity _ )
+    val sym = images.map(new RotationSymmetry(_).symmetry)
 
     val series1 = new XYSeries(key)
 
@@ -71,18 +84,16 @@ class ClassificationTest extends FunSuite {
     var n = 0
     for {
       (imageData, sym) <- images1 zip symmetries
-      if sym < -0.1
+      if sym < -0.2
     } {
       val image = MyMnistReader.asBufferedImage(imageData)
 
       val tempPath = "/Users/zy/Documents/workspace/mnist/temp"
-
-//      Path currentPath = Paths.get(System.getProperty("user.dir"));
-//      Path filePath = Paths.get(currentPath.toString(), "data", "foo.txt");
 
       ImageIO.write(image, "png",
         Paths.get(tempPath, s"low-symmetry-$n.png").toFile)
       n += 1
     }
   }
+
 }

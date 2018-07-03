@@ -5,6 +5,8 @@ temp/
 
 .DS_Store
 
+*.h5
+
 # MNIST data
 *-images-idx3-ubyte
 *-labels-idx1-ubyte

@@ -1,5 +1,7 @@
 import java.io.File
+
 import javax.imageio.ImageIO
+import mnist.data.MyMnistReader
 
 val images1 = MyMnistReader.getImageData(1)
 

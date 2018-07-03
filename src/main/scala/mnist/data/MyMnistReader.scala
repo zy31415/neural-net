@@ -1,3 +1,5 @@
+package mnist.data
+
 import java.awt.image.{BufferedImage, ByteLookupTable, LookupOp}
 
 import mnist.MnistReader
@@ -7,8 +9,8 @@ import scala.collection.JavaConverters._
 
 object MyMnistReader {
 
-  def imagePath = getClass.getResource("train-images-idx3-ubyte").getPath
-  def labelPath = getClass.getResource("train-labels-idx1-ubyte").getPath
+  def imagePath = getClass.getResource("/train-images-idx3-ubyte").getPath
+  def labelPath = getClass.getResource("/train-labels-idx1-ubyte").getPath
 
   def numImages = imageData.length
   def imageHeight = 28
