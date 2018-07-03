@@ -7,9 +7,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import scala.collection.mutable.ArrayBuffer
 
 
-object DataPreprocessor {
-
-  val dataFilename = "/Users/zy/Documents/workspace/mnist/workspace/data/data.h5"
+object GenerateData {
 
   def selectOnesAndFives(outputPath: String): Unit = {
 
@@ -52,7 +50,7 @@ object DataPreprocessor {
       Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE)
 
     val imageDataDS = testFile.createScalarDS(
-      "Data Image", g1, dtype,
+      "Image Data", g1, dtype,
       Array[Long](imageData.length, imageData(0).length),
       null, null, 0,
       imageData
@@ -75,5 +73,4 @@ object DataPreprocessor {
     testFile.close()
 
   }
-
-  }
+}

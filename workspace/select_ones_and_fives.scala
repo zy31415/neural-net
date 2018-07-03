@@ -1,5 +1,5 @@
-import mnist.data.DataPreprocessor
+import mnist.data.GenerateData
 
-DataPreprocessor.selectOnesAndFives(
-  "/Users/zy/Documents/workspace/mnist/workspace/data"
+GenerateData.selectOnesAndFives(
+  "/Users/zy/Documents/workspace/mnist/src/main/resources/data.h5"
 )
