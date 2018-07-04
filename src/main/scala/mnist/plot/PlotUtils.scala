@@ -1,7 +1,6 @@
 package mnist.plot
 
 import java.awt.image.{BufferedImage, ByteLookupTable, LookupOp}
-
 import mnist.data.MyMnistReader
 
 object PlotUtils {
@@ -12,6 +11,9 @@ object PlotUtils {
     setValue(bufferedImage, imageData)
     revertGrayScale(bufferedImage)
   }
+
+  def asBufferedImage(imageData: Array[Double]): BufferedImage =
+    asBufferedImage(imageData.map(Math.round(_).toInt))
 
   private def setValue(image: BufferedImage, imageData: Array[Int]): Unit =
     for ((ele, i) <- imageData.view.zipWithIndex)

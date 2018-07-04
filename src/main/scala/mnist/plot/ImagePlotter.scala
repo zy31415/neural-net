@@ -11,13 +11,24 @@ object ImagePlotter {
     val imageData = DataReader.getImageData()
     val labels = DataReader.getLabels()
 
-    var n = 0
-    for ((d, l) <- imageData zip labels) {
-      val image = PlotUtils.asBufferedImage(d)
-      ImageIO.write(image, "png",
-        Paths.get(outputPath, f"$n%05d-$l.png").toFile
-      )
-      n += 1
+    for (((d, l), n) <- (imageData zip labels).zipWithIndex)
+      plot(d, Paths.get(outputPath, f"$n%05d-$l.png").toString)
+  }
+
+  def plot(imageData: Array[Int], filename: String): Unit =
+    ImageIO.write(PlotUtils.asBufferedImage(imageData), "png", new File(filename))
+
+  def plot(imageData: Array[Double], filename: String): Unit =
+    plot(imageData.map(Math.round(_).toInt), filename)
+
+  def plotChar(imageData: Array[Int]): Unit = {
+    for ((a, n) <- imageData.zipWithIndex){
+      if (a != 0 )
+        print( "* ")
+      else
+        print("  ")
+      if (n % 28 == 0)
+        println("")
     }
   }
 }
