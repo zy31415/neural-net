@@ -3,6 +3,7 @@ package mnist.classification
 import java.awt.Color
 import java.awt.geom.{Ellipse2D, Rectangle2D}
 import java.io.File
+import java.util.concurrent.{Callable, Executors, Future}
 
 import mnist.data.DataReader
 import mnist.features.{FeatureExtractor, SymmetryChooser}
@@ -24,19 +25,24 @@ object Classification {
   }
 
   private def getFeatureSeries(imageData: Array[Array[Int]], key: String): XYSeries = {
-
-    val (intensities, symmetries) = calculateIntensitiesAndSymmetries(imageData)
-
+    val pairs= calculateIntensitiesAndSymmetries(imageData)
     val series = new XYSeries(key)
-
-    for ((i, s) <- intensities zip symmetries) {
-      series.add(i, s)
-    }
+    pairs.foreach(p => series.add(p._1, p._2))
     series
   }
 
-  private def calculateIntensitiesAndSymmetries(imageData: Array[Array[Int]]): (Array[Double], Array[Double]) = {
-    (imageData.map(FeatureExtractor.intensity(_)), imageData.map(new SymmetryChooser(_).symmetry))
+  private def calculateIntensitiesAndSymmetries(imageData: Array[Array[Int]]): List[(Double, Double)]= {
+    val numThreads = 2
+    val pool = Executors.newFixedThreadPool(numThreads)
+
+    var resultsFuture = List[Future[(Double, Double)]]()
+
+    for(row <- imageData)
+      resultsFuture =  pool.submit(
+        () => (FeatureExtractor.intensity(row), new SymmetryChooser(row).symmetry())
+      ) :: resultsFuture
+
+    resultsFuture.map(_.get())
   }
 
   private def plot(dataset: XYSeriesCollection, filename: String): Unit = {
