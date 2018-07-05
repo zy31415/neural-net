@@ -1,15 +1,16 @@
-import java.lang.Math
+package mnist.features
+
 import java.nio.file.Paths
 
 import javax.imageio.ImageIO
-import mnist.data.MyMnistReader
+import mnist.data.{DataReader, MyMnistReader}
 import org.scalatest.FunSuite
 
-class RotationSymmetryTest extends FunSuite {
+class SymmetryMaximizerTest extends FunSuite {
   test("Rotation Symmetry") {
-    val images1 = MyMnistReader.getImageData(1)
+    val nth = 99
 
-    val imageData = images1(200)
+    val imageData = DataReader.getImageData()(nth)
 
     val image = MyMnistReader.asBufferedImage(imageData)
 
@@ -18,7 +19,7 @@ class RotationSymmetryTest extends FunSuite {
     ImageIO.write(image, "png",
       Paths.get(tempPath, s"low-symmetry.png").toFile)
 
-    val sym = new RotationSymmetry(imageData)
+    val sym = new SymmetryMaximizer(imageData)
     println(sym.symmetry)
     println(sym.vals)
     println(sym.alphas.map(_*180.0/Math.PI))
@@ -41,7 +42,7 @@ class RotationSymmetryTest extends FunSuite {
       ImageIO.write(image, "png",
         Paths.get(tempPath, s"low-symmetry-$n.png").toFile)
 
-      val sym = new RotationSymmetry(imageData)
+      val sym = new SymmetryMaximizer(imageData)
       println(sym.symmetry, sym.alpha * 180.0 / Math.PI)
 
       n += 1

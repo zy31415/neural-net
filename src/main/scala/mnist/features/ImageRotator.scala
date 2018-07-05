@@ -1,36 +1,30 @@
 package mnist.features
 
 import mnist.ProjectConstant
-import mnist.ProjectConstant.{ImageHalfWidth, ImageWidth}
-import mnist.interpolation.NearestInterpolator
-import org.apache.commons.math3.exception.OutOfRangeException
+import mnist.interpolation.NearestNeighborInterpolator
 
 import scala.collection.mutable.ArrayBuffer
 
 class ImageRotator(image: Array[Int]) {
-  private val interpolator = new NearestInterpolator(
+  private val interpolator = new NearestNeighborInterpolator(
     ImageRotator.GridPoints,
     ImageRotator.GridPoints,
-    image.grouped(ProjectConstant.ImageWidth).toArray
+    image
   )
 
-  private def function(x: Double, y: Double): Double  =
-    try {
-      _function.value(x, y)
-    } catch {
-      case e: OutOfRangeException => 0.0
-    }
+  private def function(x: Double, y: Double): Int  =
+    interpolator.interpolate(x, y)
 
-  def rotate(alpha: Double): Array[Double] = {
+  def rotate(alpha: Double): Array[Int] = {
     val cos = Math.cos(alpha)
     val sin = Math.sin(alpha)
-    val result = ArrayBuffer[Double]()
+    val result = ArrayBuffer[Int]()
 
-    for (m <- ImageRotator.GridPoints) {
-      for (n <- ImageRotator.GridPoints) {
-        val _m = cos * m + sin * n
-        val _n = -sin * m + cos * n
-        result += function(_m, _n)
+    for (y <- ImageRotator.GridPoints) {
+      for (x <- ImageRotator.GridPoints) {
+        val _x = cos * x + sin * y
+        val _y = - sin * x + cos * y
+        result += function(_x, _y)
       }
     }
     result.toArray
@@ -38,6 +32,5 @@ class ImageRotator(image: Array[Int]) {
 }
 
 object ImageRotator {
-  val GridPoints: Array[Int] =
-    (- ImageHalfWidth + 1 to ImageHalfWidth by 1).toArray
+  val GridPoints = ProjectConstant.GridPoints
 }

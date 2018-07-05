@@ -1,6 +1,7 @@
 .idea/
 target/
 *.png
+*.jpeg
 temp/
 
 .DS_Store

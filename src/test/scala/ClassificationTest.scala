@@ -4,6 +4,7 @@ import java.nio.file.Paths
 
 import javax.imageio.ImageIO
 import mnist.data.MyMnistReader
+import mnist.features.{FeatureExtractor, SymmetryMaximizer}
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.{ChartFactory, ChartUtils}
 import org.jfree.data.xy.{XYSeries, XYSeriesCollection}
@@ -66,7 +67,7 @@ class ClassificationTest extends FunSuite {
 
   private def addSeriesSymmetryRotation(dataset: XYSeriesCollection, images: List[Array[Int]], key: String): Unit = {
     val it = images.map(FeatureExtractor.intensity _ )
-    val sym = images.map(new RotationSymmetry(_).symmetry)
+    val sym = images.map(new SymmetryMaximizer(_).symmetry)
 
     val series1 = new XYSeries(key)
 

@@ -1,3 +1,5 @@
+package mnist.features
+
 object FeatureExtractor {
 
   val NumWidth = 28
