@@ -24,8 +24,8 @@ object Classification {
   }
 
   private def getFeatureSeries(imageData: Array[Array[Int]], key: String): XYSeries = {
-    val intensities = imageData.map(FeatureExtractor.intensity(_))
-    val symmetries = imageData.map(new SymmetryChooser(_).symmetry)
+
+    val (intensities, symmetries) = calculateIntensitiesAndSymmetries(imageData)
 
     val series = new XYSeries(key)
 
@@ -33,6 +33,10 @@ object Classification {
       series.add(i, s)
     }
     series
+  }
+
+  private def calculateIntensitiesAndSymmetries(imageData: Array[Array[Int]]): (Array[Double], Array[Double]) = {
+    (imageData.map(FeatureExtractor.intensity(_)), imageData.map(new SymmetryChooser(_).symmetry))
   }
 
   private def plot(dataset: XYSeriesCollection, filename: String): Unit = {
