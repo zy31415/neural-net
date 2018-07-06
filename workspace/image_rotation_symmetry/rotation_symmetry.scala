@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 
 
 def getRotationSymmetry(angles: Array[Double], nth: Integer): Array[Double] = {
-  val imageData = DataReader.getImageData()(nth)
+  val imageData = DataReader.getAllImageDataAsMatrix()(nth)
   val rotator = new ImageRotator(imageData)
   val symmetry = ArrayBuffer[Double]()
   for (r <- angles) {

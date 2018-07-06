@@ -8,8 +8,8 @@ import mnist.data.DataReader
 
 object ImagePlotter {
   def plotAll(outputPath: String): Unit = {
-    val imageData = DataReader.getImageData()
-    val labels = DataReader.getLabels()
+    val imageData = DataReader.getAllImageDataAsMatrix()
+    val labels = DataReader.getAllLabels()
 
     for (((d, l), n) <- (imageData zip labels).zipWithIndex)
       plot(d, Paths.get(outputPath, f"$n%05d-$l.png").toString)
@@ -21,14 +21,14 @@ object ImagePlotter {
   def plot(imageData: Array[Double], filename: String): Unit =
     plot(imageData.map(Math.round(_).toInt), filename)
 
-  def plotChar(imageData: Array[Int]): Unit = {
-    for ((a, n) <- imageData.zipWithIndex){
-      if (a != 0 )
-        print( "* ")
-      else
-        print("  ")
-      if (n % 28 == 0)
-        println("")
-    }
-  }
+//  def plotChar(imageData: Array[Int]): Unit = {
+//    for ((a, n) <- imageData.zipWithIndex){
+//      if (a != 0 )
+//        print( "* ")
+//      else
+//        print("  ")
+//      if (n % 28 == 0)
+//        println("")
+//    }
+//  }
 }

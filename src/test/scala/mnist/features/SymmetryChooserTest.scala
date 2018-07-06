@@ -7,7 +7,7 @@ class SymmetryChooserTest extends FunSuite {
 
   test("symmetry") {
     val nth = 99
-    val imageData = DataReader.getImageData()(nth)
+    val imageData = DataReader.getAllImageDataAsMatrix()(nth)
     val chooser = new SymmetryChooser(imageData)
     println(chooser.symmetry(), chooser.alpha)
     println(chooser.allSyms)

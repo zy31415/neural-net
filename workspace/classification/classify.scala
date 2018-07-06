@@ -1,3 +1,3 @@
 import mnist.plot.PlotSymmetryVSIntensity
 
-PlotSymmetryVSIntensity.classify("workspace/classification/class.jpeg")
+PlotSymmetryVSIntensity.plot("workspace/classification/class.jpeg")

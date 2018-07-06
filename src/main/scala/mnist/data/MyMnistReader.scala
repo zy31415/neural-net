@@ -7,6 +7,7 @@ import mnist.MnistReader
 import scala.collection.JavaConverters._
 
 
+@deprecated
 object MyMnistReader {
 
   def imagePath = getClass.getResource("/train-images-idx3-ubyte").getPath
@@ -35,6 +36,7 @@ object MyMnistReader {
 
   def images (nth: Int): BufferedImage = asBufferedImage(imageData(nth))
 
+  @deprecated
   def asBufferedImage(imageData: Array[Int]): BufferedImage = {
     val bufferedImage = new BufferedImage(
       MyMnistReader.imageWidth, MyMnistReader.imageHeight, BufferedImage.TYPE_BYTE_GRAY)
