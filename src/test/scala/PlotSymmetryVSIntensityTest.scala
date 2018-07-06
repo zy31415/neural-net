@@ -10,7 +10,7 @@ import org.jfree.chart.{ChartFactory, ChartUtils}
 import org.jfree.data.xy.{XYSeries, XYSeriesCollection}
 import org.scalatest.FunSuite
 
-class ClassificationTest extends FunSuite {
+class PlotSymmetryVSIntensityTest extends FunSuite {
   test("test") {
     val images5 = MyMnistReader.getImageData(5)
     val images1 = MyMnistReader.getImageData(1)
