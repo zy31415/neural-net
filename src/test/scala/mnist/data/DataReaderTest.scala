@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 
 class DataReaderTest extends FunSuite {
   test("read") {
-    val imageData = DataReader.getAllImageDataMatrix()
+    val imageData = DataReader.getAllImageDataAsMatrix()
   }
 
   test("getImage") {

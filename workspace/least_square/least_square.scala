@@ -6,7 +6,7 @@ import mnist.plot.ImagePlotter
 
 val nth = 99
 
-val imageData = DataReader.getAllImageDataMatrix()(nth)
+val imageData = DataReader.getAllImageDataAsMatrix()(nth)
 
 ImagePlotter.plot(imageData, "workspace/least_square/before.png")
 

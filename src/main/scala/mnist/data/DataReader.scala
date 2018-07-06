@@ -13,7 +13,7 @@ object DataReader {
   private var _labels: Array[Int] = _
   private var _indices: Array[Int] = _
 
-  def getAllImageDataMatrix(): Array[Array[Int]] = {
+  def getAllImageDataAsMatrix(): Array[Array[Int]] = {
     if (_imageData == null) {
       open()
       val dataset = testFile.get("/Data/Image Data").asInstanceOf[Dataset]
@@ -45,7 +45,7 @@ object DataReader {
 
     val results = dataset.getData
     close()
-    new MnistImage(results.asInstanceOf[Array[Int]], getAllIndices()(index), index)
+    new MnistImage(results.asInstanceOf[Array[Int]], getAllLabels()(index), getAllIndices()(index), index)
   }
 
   def getAllLabels(): Array[Int] = {
@@ -81,7 +81,7 @@ object DataReader {
   private def close(): Unit = testFile.close()
 
   def getImageDataByLabel(label: Int) = {
-    val imageData = getAllImageDataMatrix()
+    val imageData = getAllImageDataAsMatrix()
     val labels = getAllLabels()
 
     val results = ListBuffer[Array[Int]]()
@@ -90,6 +90,8 @@ object DataReader {
     results.toArray
   }
 
+
+
   /**
     * Return (index, imageData) pair picked by labels.
     *   Index is the index in the original MNIST dataset.
@@ -97,14 +99,35 @@ object DataReader {
     * @param label
     * @return
     */
-  def getImageDataByLabelWithIndices(label: Int): Array[(Int, Array[Int])] = {
-    val imageData = getAllImageDataMatrix()
+  @deprecated def getImageDataByLabelWithIndices(label: Int): Array[(Int, Array[Int])] = {
+    val imageData = getAllImageDataAsMatrix()
     val labels = getAllLabels()
     val indices = getAllIndices()
 
     val results = ListBuffer[(Int, Array[Int])]()
     for ((index, data, l) <- (indices, imageData, labels).zipped.toList if l == label)
       results.append((index, data))
+    results.toArray
+  }
+
+  /**
+    * Return an array of MnistImage objects.
+    *
+    * @param label
+    * @return
+    */
+  def getMnistImageByLabel(label: Int): Array[MnistImage] = {
+    val imageData = getAllImageDataAsMatrix()
+    val labels = getAllLabels()
+    val indices = getAllIndices()
+
+    val results = ListBuffer[MnistImage]()
+
+    val n = 0
+    for ((index, data, l) <- (indices, imageData, labels).zipped.toList if l == label) {
+      results.append(new MnistImage(data, l, index, n))
+    }
+
     results.toArray
   }
 }

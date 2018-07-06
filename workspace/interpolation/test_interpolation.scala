@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
 val interpolator = new BicubicSplineInterpolator()
 
 val nth = 100
-val imageData = DataReader.getAllImageDataMatrix()(nth)
+val imageData = DataReader.getAllImageDataAsMatrix()(nth)
 
 val grids = (-13 to 14).map(_.toDouble).toArray
 
@@ -44,5 +44,5 @@ image = new LookupOp(
   .filter(image, null)
 
 ImageIO.write(image,"png",
-  new File("workspace/interpolation/dense.png"))
+  new File("workspace/mnist.interpolation/dense.png"))
 

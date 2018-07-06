@@ -8,7 +8,7 @@ import mnist.plot.PlotUtils
 
 val outputPath = "/Users/zy/Documents/workspace/mnist/workspace/plots_sharpened"
 
-val imageData = DataReader.getAllImageDataMatrix()
+val imageData = DataReader.getAllImageDataAsMatrix()
 val labels = DataReader.getAllLabels()
 
 var n = 0

@@ -1,6 +1,20 @@
 package mnist.data
 
-class MnistImage(val data: Array[Int], val index0: Int, val index1: Int) {
+import mnist.plot.PlotUtils
+
+import scala.collection.immutable.HashMap
+import scala.collection.mutable
+
+/**
+  * This is the class is to hold array data reading from mnist dataset.
+  *
+  * @param data
+  * @param index0  original MNIST index
+  * @param index1  Index in the selected dataset
+  */
+class MnistImage(val data: Array[Int], val label: Int, val index0: Int, val index1: Int) {
+
+  val properties = mutable.HashMap[String, Double]()
 
   override def toString: String = {
     val builder = new StringBuilder
@@ -12,6 +26,8 @@ class MnistImage(val data: Array[Int], val index0: Int, val index1: Int) {
 
     builder.mkString
   }
+
+  def toBufferedImage() = PlotUtils.asBufferedImage(data)
 
 }
 

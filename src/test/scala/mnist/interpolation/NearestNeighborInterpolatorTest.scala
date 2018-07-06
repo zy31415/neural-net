@@ -1,4 +1,4 @@
-package interpolation
+package mnist.interpolation
 
 import mnist.interpolation.NearestNeighborInterpolator
 import org.scalatest.FunSuite

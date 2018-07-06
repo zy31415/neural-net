@@ -8,7 +8,7 @@ import mnist.data.DataReader
 
 object ImagePlotter {
   def plotAll(outputPath: String): Unit = {
-    val imageData = DataReader.getAllImageDataMatrix()
+    val imageData = DataReader.getAllImageDataAsMatrix()
     val labels = DataReader.getAllLabels()
 
     for (((d, l), n) <- (imageData zip labels).zipWithIndex)

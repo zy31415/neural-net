@@ -4,7 +4,7 @@ import mnist.plot.ImagePlotter
 
 val nth = 200
 
-val imageData = DataReader.getAllImageDataMatrix()(nth)
+val imageData = DataReader.getAllImageDataAsMatrix()(nth)
 
 ImagePlotter.plotChar(imageData)
 
