@@ -24,8 +24,8 @@ object PlotSymmetryVSIntensity {
 
   private def makeDataset():XYSeriesCollection = {
     val dataset = new XYSeriesCollection()
-    val imageData1 = DataReader.getImageDataWithLabel(1)
-    val imageData5 = DataReader.getImageDataWithLabel(5)
+    val imageData1 = DataReader.getImageDataByLabel(1)
+    val imageData5 = DataReader.getImageDataByLabel(5)
     dataset.addSeries(getFeatureSeries(imageData1, "label 1"))
     dataset.addSeries(getFeatureSeries(imageData5, "label 5"))
     dataset

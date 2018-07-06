@@ -31,6 +31,5 @@ class SymmetryChooser(val imageData: Array[Int]) {
 }
 
 object SymmetryChooser {
-//  val angles = List(-60.0, -45.0, -30.0, -15.0, 0.0, 15.0, 30.0, 45.0, 60.0)
   val angles = -95 to 95 by 1 map(_.toDouble)
 }

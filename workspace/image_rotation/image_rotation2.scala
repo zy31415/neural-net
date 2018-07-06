@@ -7,7 +7,7 @@ import mnist.data.DataReader
 import mnist.plot.PlotUtils
 
 val nth = 100
-val imageData = DataReader.getImageData()(nth)
+val imageData = DataReader.getAllImageDataMatrix()(nth)
 
 val image = PlotUtils.asBufferedImage(imageData)
 

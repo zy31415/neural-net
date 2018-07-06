@@ -1,6 +1,10 @@
 package mnist
 
-object ProjectConstant {
+/**
+  *  Deprecated. Move constants to MnistImage.
+  */
+@deprecated object ProjectConstant {
+
   val ImageWidth = 28
   val ImageHeight = ImageWidth
   val numPixels = ImageWidth * ImageHeight

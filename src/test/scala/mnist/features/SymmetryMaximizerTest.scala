@@ -10,7 +10,7 @@ class SymmetryMaximizerTest extends FunSuite {
   test("Rotation Symmetry") {
     val nth = 99
 
-    val imageData = DataReader.getImageData()(nth)
+    val imageData = DataReader.getAllImageDataMatrix()(nth)
 
     val image = MyMnistReader.asBufferedImage(imageData)
 

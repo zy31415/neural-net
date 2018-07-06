@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
 val interpolator = new BicubicSplineInterpolator()
 
 val nth = 100
-val imageData = DataReader.getImageData()(nth)
+val imageData = DataReader.getAllImageDataMatrix()(nth)
 
 val grids = (-13 to 14).map(_.toDouble).toArray
 

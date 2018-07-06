@@ -1,6 +1,6 @@
 package mnist.features
 
-import mnist.ProjectConstant
+import mnist.data.MnistImage
 import mnist.interpolation.NearestNeighborInterpolator
 
 import scala.collection.mutable.ArrayBuffer
@@ -32,5 +32,5 @@ class ImageRotator(image: Array[Int]) {
 }
 
 object ImageRotator {
-  val GridPoints = ProjectConstant.GridPoints
+  val GridPoints = MnistImage.GridPoints
 }

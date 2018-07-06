@@ -3,7 +3,7 @@ import mnist.plot.ImagePlotter
 
 val nth = 1000
 
-val imageData = DataReader.getImageData()(nth)
+val imageData = DataReader.getAllImageDataMatrix()(nth)
 
 ImagePlotter.plotChar(imageData)
 
@@ -13,7 +13,7 @@ val rotator = new import mnist.data.DataReader
 
 val nth = 1000
 
-val imageData = DataReader.getImageData()(nth)
+val imageData = DataReader.getAllImageDataMatrix()(nth)
 
 ImagePlotter.plotChar(imageData)
 
