@@ -1,5 +1,8 @@
 package mnist.features
 
+/**
+  * Feature calculator for simple features.
+  */
 object FeatureExtractor {
 
   val NumWidth = 28

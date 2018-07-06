@@ -5,6 +5,10 @@ import mnist.interpolation.NearestNeighborInterpolator
 
 import scala.collection.mutable.ArrayBuffer
 
+/**
+  * Rotate image.
+  * @param image
+  */
 class ImageRotator(image: Array[Int]) {
   private val interpolator = new NearestNeighborInterpolator(
     ImageRotator.GridPoints,

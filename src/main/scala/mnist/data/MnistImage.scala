@@ -2,7 +2,6 @@ package mnist.data
 
 import mnist.plot.PlotUtils
 
-import scala.collection.immutable.HashMap
 import scala.collection.mutable
 
 /**

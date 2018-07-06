@@ -3,7 +3,7 @@ package mnist.features
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  *  Try several predefined rotation angles and pick the best one
+  *  Try several predefined rotation angles and pick the one that has the largest symmetry.
   */
 class SymmetryChooser(val imageData: Array[Int]) {
 
