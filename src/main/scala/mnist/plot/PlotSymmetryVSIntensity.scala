@@ -3,10 +3,9 @@ package mnist.plot
 import java.awt.Color
 import java.awt.geom.{Ellipse2D, Rectangle2D}
 import java.io.File
-import java.util.concurrent.{Executors, Future}
 
-import mnist.data.DataReader
-import mnist.features.{FeatureExtractor, SymmetryChooser}
+import mnist.data.MnistImage
+import mnist.features.IntensityAndSymmetryCalculationThreadPool
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.{ChartFactory, ChartUtils}
 import org.jfree.data.xy.{XYSeries, XYSeriesCollection}
@@ -20,38 +19,27 @@ object PlotSymmetryVSIntensity {
 
   val NumThreads = 4
 
-  def classify(filename: String): Unit = plot(makeDataset(), filename)
+  def plot(filename: String): Unit = plot(makeDataset(), filename)
 
   private def makeDataset():XYSeriesCollection = {
     val dataset = new XYSeriesCollection()
-    val imageData1 = DataReader.getImageDataByLabel(1)
-    val imageData5 = DataReader.getImageDataByLabel(5)
-    dataset.addSeries(getFeatureSeries(imageData1, "label 1"))
-    dataset.addSeries(getFeatureSeries(imageData5, "label 5"))
+
+    for (label <- Array(1, 5)) {
+      val pool = new IntensityAndSymmetryCalculationThreadPool(NumThreads)
+      pool.addLabel(label)
+      pool.calculate()
+      val results = pool.results
+      dataset.addSeries(getFeatureSeries(results, s"label $label"))
+    }
     dataset
   }
 
-  private def getFeatureSeries(imageData: Array[Array[Int]], key: String): XYSeries = {
-    val pairs= calculateIntensitiesAndSymmetries(imageData)
+  private def getFeatureSeries(images: List[MnistImage], key: String): XYSeries = {
     val series = new XYSeries(key)
-    pairs.foreach(p => series.add(p._1, p._2))
+    for (i <- images) {
+      series.add(i.properties("intensity"), i.properties("symmetry"))
+    }
     series
-  }
-
-  private def calculateIntensitiesAndSymmetries(imageData: Array[Array[Int]]): List[(Double, Double)]= {
-    val pool = Executors.newFixedThreadPool(NumThreads)
-
-    var resultsFuture = List[Future[(Double, Double)]]()
-
-    for(row <- imageData)
-      resultsFuture =  pool.submit(
-        () => (FeatureExtractor.intensity(row), new SymmetryChooser(row).symmetry())
-      ) :: resultsFuture
-
-    val results = resultsFuture.map(_.get())
-    pool.shutdown()
-
-    results
   }
 
   private def plot(dataset: XYSeriesCollection, filename: String): Unit = {
