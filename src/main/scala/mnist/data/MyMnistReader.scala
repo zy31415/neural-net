@@ -17,19 +17,19 @@ object MyMnistReader {
   def trainImagePath = getClass.getResource("/train-images-idx3-ubyte").getPath
   def trainLabelPath = getClass.getResource("/train-labels-idx1-ubyte").getPath
 
-  private var _train_images: List[Array[Int]] = _
+  private var _train_images: Array[Array[Int]] = _
   private var _train_labels: Array[Int] = _
 
-  def trainImageData: List[Array[Int]] = {
+  def trainImageData: Array[Array[Int]] = {
     if (_train_images == null) {
-      _train_images = MnistReader.getImages(trainImagePath).asScala.toList.map(_.flatten)
+      _train_images = MnistReader.getImages(trainImagePath).asScala.toArray.map(_.flatten)
     }
     _train_images
   }
 
   def trainLabels: Array[Int] = {
     if (_train_labels == null) {
-      _train_labels = MnistReader.getLabels(testLabelPath)
+      _train_labels = MnistReader.getLabels(trainLabelPath)
     }
     _train_labels
   }
@@ -39,12 +39,12 @@ object MyMnistReader {
   def testImagePath = getClass.getResource("/t10k-images-idx3-ubyte").getPath
   def testLabelPath = getClass.getResource("/t10k-labels-idx1-ubyte").getPath
 
-  private var _test_images: List[Array[Int]] = _
+  private var _test_images: Array[Array[Int]] = _
   private var _test_labels: Array[Int] = _
 
-  def testImageData: List[Array[Int]] = {
+  def testImageData: Array[Array[Int]] = {
     if (_test_images == null) {
-      _test_images = MnistReader.getImages(trainImagePath).asScala.toList.map(_.flatten)
+      _test_images = MnistReader.getImages(testImagePath).asScala.toArray.map(_.flatten)
     }
     _test_images
   }
