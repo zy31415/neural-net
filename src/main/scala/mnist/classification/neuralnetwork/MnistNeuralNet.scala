@@ -4,6 +4,8 @@ import breeze.linalg.DenseMatrix
 import mnist.data.MnistImage
 
 class MnistNeuralNet {
+
+  val rho = 0.1
   var inputLayer: InputLayer = _
   var outputLayer: OutputLayer = _
 
@@ -14,22 +16,39 @@ class MnistNeuralNet {
   }
 
   def train(Xs: List[DenseMatrix[Double]], Ys: List[DenseMatrix[Double]]): Unit = {
-    for((x, y) <- Xs zip Ys) {
+    for ((x, y) <- Xs zip Ys) {
       inputLayer.in = x
       outputLayer.y = y
-
       // Forwarding calculation
       outputLayer.out
 
-      // Backward propagation
-      var layer = outputLayer
-
-      while(layer.preLayer.isInstanceOf[ForwardLayer]) {
-        layer.backPropagate()
-        layer = layer.preLayer
-      }
-
+      // train
+      backPropagate()
+      update()
     }
+  }
 
+  private def backPropagate(): Unit = {
+    var layer:ForwardLayer = outputLayer
+
+    while(layer != null) {
+      layer.backPropagate()
+      if (layer.preLayer != inputLayer)
+        layer = layer.preLayer.asInstanceOf[ForwardLayer]
+      else
+        layer = null
+    }
+  }
+
+  private def update(): Unit = {
+    var layer:ForwardLayer = outputLayer
+
+    while(layer != null) {
+      layer.update(rho)
+      if (layer.preLayer != inputLayer)
+        layer = layer.preLayer.asInstanceOf[ForwardLayer]
+      else
+        layer = null
+    }
   }
 }
