@@ -7,34 +7,57 @@ import mnist.MnistReader
 import scala.collection.JavaConverters._
 
 
-@deprecated
 object MyMnistReader {
 
-  def imagePath = getClass.getResource("/train-images-idx3-ubyte").getPath
-  def labelPath = getClass.getResource("/train-labels-idx1-ubyte").getPath
-
-  def numImages = imageData.length
+  def numImages = trainImageData.length
   def imageHeight = 28
   def imageWidth = 28
 
-  private var _images: List[Array[Int]] = _
-  private var _labels: Array[Int] = _
+  // Train dataset
+  def trainImagePath = getClass.getResource("/train-images-idx3-ubyte").getPath
+  def trainLabelPath = getClass.getResource("/train-labels-idx1-ubyte").getPath
 
-  def imageData: List[Array[Int]] = {
-    if (_images == null) {
-      _images = MnistReader.getImages(imagePath).asScala.toList.map(_.flatten)
+  private var _train_images: List[Array[Int]] = _
+  private var _train_labels: Array[Int] = _
+
+  def trainImageData: List[Array[Int]] = {
+    if (_train_images == null) {
+      _train_images = MnistReader.getImages(trainImagePath).asScala.toList.map(_.flatten)
     }
-    _images
+    _train_images
   }
 
-  def labels: Array[Int] = {
-    if (_labels == null) {
-      _labels = MnistReader.getLabels(labelPath)
+  def trainLabels: Array[Int] = {
+    if (_train_labels == null) {
+      _train_labels = MnistReader.getLabels(testLabelPath)
     }
-    _labels
+    _train_labels
   }
 
-  def images (nth: Int): BufferedImage = asBufferedImage(imageData(nth))
+
+  // Testing dataset
+  def testImagePath = getClass.getResource("/t10k-images-idx3-ubyte").getPath
+  def testLabelPath = getClass.getResource("/t10k-labels-idx1-ubyte").getPath
+
+  private var _test_images: List[Array[Int]] = _
+  private var _test_labels: Array[Int] = _
+
+  def testImageData: List[Array[Int]] = {
+    if (_test_images == null) {
+      _test_images = MnistReader.getImages(trainImagePath).asScala.toList.map(_.flatten)
+    }
+    _test_images
+  }
+
+  def testLabels: Array[Int] = {
+    if (_test_labels == null) {
+      _test_labels = MnistReader.getLabels(testLabelPath)
+    }
+    _test_labels
+  }
+
+  @deprecated
+  def images (nth: Int): BufferedImage = asBufferedImage(trainImageData(nth))
 
   @deprecated
   def asBufferedImage(imageData: Array[Int]): BufferedImage = {
@@ -44,21 +67,25 @@ object MyMnistReader {
     revertGrayScale(bufferedImage)
   }
 
-  private def setValue(image: BufferedImage, nth: Int): Unit = setValue(image, imageData(nth))
+  @deprecated
+  private def setValue(image: BufferedImage, nth: Int): Unit = setValue(image, trainImageData(nth))
 
+  @deprecated
   private def setValue(image: BufferedImage, imageData: Array[Int]): Unit =
     for ((ele, i) <- imageData.view.zipWithIndex)
       image.getRaster.getDataBuffer.setElem(i, ele)
 
+  @deprecated
   private def revertGrayScale(image: BufferedImage): BufferedImage =
     new LookupOp(
       new ByteLookupTable(0, (255 to 0 by -1).map(_.toByte).toArray),
       null)
       .filter(image, null)
 
+  @deprecated
   def getImageData(label: Int): List[Array[Int]] = {
     var result: List[Array[Int]] = Nil
-    for((d, l) <- imageData zip labels if l == label)
+    for((d, l) <- trainImageData zip trainLabels if l == label)
       result = d :: result
     result
   }
