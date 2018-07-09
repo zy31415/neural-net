@@ -12,3 +12,6 @@ libraryDependencies += "org.jfree" % "jfreechart" % "1.5.0"
 // https://mvnrepository.com/artifact/org.scalanlp/breeze
 libraryDependencies += "org.scalanlp" %% "breeze" % "0.13.2"
 
+// https://mvnrepository.com/artifact/com.github.fommil.netlib/all
+libraryDependencies += "com.github.fommil.netlib" % "all" % "1.1.2" pomOnly()
+
