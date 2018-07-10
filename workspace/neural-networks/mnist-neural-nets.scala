@@ -1,10 +1,10 @@
 import breeze.linalg.DenseMatrix
-import mnist.classification.neuralnetwork.MnistNeuralNet
+import mnist.classification.neuralnetwork.NeuralNet
 import mnist.data.MyMnistReader
 
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ListBuffer
 
-val neuralNets = new MnistNeuralNet()
+val neuralNets = new NeuralNet()
 
 val data = MyMnistReader.trainImageData
 val labels = MyMnistReader.trainLabels

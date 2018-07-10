@@ -3,9 +3,9 @@ package mnist.classification.neuralnetwork
 import breeze.linalg.DenseMatrix
 import mnist.data.MnistImage
 
-class MnistNeuralNet {
+class NeuralNet {
 
-  val rho = 0.1
+  val rho = 1.0
   var inputLayer: InputLayer = _
   var outputLayer: OutputLayer = _
 
@@ -26,6 +26,7 @@ class MnistNeuralNet {
       backPropagate()
       update()
     }
+    println("Stop")
   }
 
   private def backPropagate(): Unit = {
