@@ -72,7 +72,7 @@ object ForwardLayer {
       else
         result += a
     }
-    result/list.length
+    result /:/ list.length.toDouble
   }
 }
 

@@ -13,21 +13,22 @@ class NeuralNetTest extends FunSuite {
     ForwardLayer.isRandomInitialization = true
 
     val neuralNets = new NeuralNet(
-      Array(MnistImage.numPixels, 100, 30, 15, 10),
-      learningRate = 0.01,
-      ifRandomShuffle = true
+      Array(MnistImage.numPixels, 100, 30, 10),
+      learningRate = 1.0,
+      ifRandomShuffle = true,
+      miniBatchSize = 10
     )
 
-    val data = MyMnistReader.trainImageData
-    val labels = MyMnistReader.trainLabels
+    val data = MyMnistReader.trainImageData.slice(0, 1000)
+    val labels = MyMnistReader.trainLabels.slice(0, 1000)
 
     neuralNets.train(
       convertData(data),
       convertLabels(labels)
     )
 
-    val testData = MyMnistReader.testImageData
-    val testLabels = MyMnistReader.testLabels
+    val testData = MyMnistReader.testImageData.slice(0, 100)
+    val testLabels = MyMnistReader.testLabels.slice(0, 100)
     val numTestSamples = testLabels.length
 
     var correctPrediction = 0
@@ -48,7 +49,7 @@ class NeuralNetTest extends FunSuite {
   def convertData(data: Array[Array[Int]]): List[DenseMatrix[Double]] = {
     val results = ListBuffer[DenseMatrix[Double]]()
     for (arr <- data) {
-      results.append(new DenseMatrix(arr.length ,1 , arr.map(_.toDouble)))
+      results.append(new DenseMatrix(arr.length ,1 , arr.map(_.toDouble)) /:/ 255.0)
     }
     results.toList
   }
