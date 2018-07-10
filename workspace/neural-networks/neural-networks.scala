@@ -1,5 +1,6 @@
 import breeze.linalg.DenseMatrix
-import mnist.classification.neuralnetwork.{HiddenLayer, InputLayer, OutputLayer}
+import mnist.classification.neuralnetwork.layer.{HiddenLayer, InputLayer, OutputLayer}
+import mnist.classification.neuralnetwork.{InputLayer, OutputLayer}
 import mnist.data.{DataReader, MnistImage}
 
 val nth = 100

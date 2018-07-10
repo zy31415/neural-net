@@ -1,4 +1,4 @@
-package mnist.classification.neuralnetwork
+package mnist.classification.neuralnetwork.layer
 
 import breeze.linalg.DenseMatrix
 

@@ -1,32 +1,43 @@
 package mnist.classification.neuralnetwork
 
-import breeze.linalg.DenseMatrix
-import mnist.data.MnistImage
+import breeze.linalg.{DenseMatrix, shuffle}
+import mnist.classification.neuralnetwork.layer._
 
-class NeuralNet {
+class NeuralNet(sizes: Array[Int],
+               val ifRandomShuffle: Boolean = true,
+               val learningRate: Double = 0.1,
+                val miniBatchSize: Int = 100) {
 
-  val rho = 1.0
-  var inputLayer: InputLayer = _
-  var outputLayer: OutputLayer = _
+  val inputLayer = new InputLayer(sizes(0))
 
-  def build(): Unit = {
-    inputLayer = new InputLayer(MnistImage.numPixels)
-    val layer1 = new HiddenLayer(inputLayer, 15)
-    outputLayer = new OutputLayer(layer1, 10)
+  val outputLayer = {
+    var preLayer:BaseLayer = inputLayer
+    for (nth <- 1 until sizes.length -1)
+      preLayer = new HiddenLayer(preLayer, sizes(nth))
+    new OutputLayer(preLayer, sizes.last)
   }
 
   def train(Xs: List[DenseMatrix[Double]], Ys: List[DenseMatrix[Double]]): Unit = {
-    for ((x, y) <- Xs zip Ys) {
-      inputLayer.in = x
-      outputLayer.y = y
+
+    val numSamples = Xs.length
+    assert(numSamples == Ys.length)
+
+    val order =
+      if (ifRandomShuffle)
+        shuffle(0 until numSamples)
+      else
+        0 until numSamples
+
+    for ((nth, count) <- order.zipWithIndex) {
+      inputLayer.in = Xs(nth)
+      outputLayer.y = Ys(nth)
       // Forwarding calculation
       outputLayer.out
-
       // train
       backPropagate()
-      update()
+      if (count % miniBatchSize == 0)
+        update()
     }
-    println("Stop")
   }
 
   private def backPropagate(): Unit = {
@@ -34,8 +45,8 @@ class NeuralNet {
 
     while(layer != null) {
       layer.backPropagate()
-      if (layer.preLayer != inputLayer)
-        layer = layer.preLayer.asInstanceOf[ForwardLayer]
+      if (layer.previous != inputLayer)
+        layer = layer.previous.asInstanceOf[ForwardLayer]
       else
         layer = null
     }
@@ -45,9 +56,9 @@ class NeuralNet {
     var layer:ForwardLayer = outputLayer
 
     while(layer != null) {
-      layer.update(rho)
-      if (layer.preLayer != inputLayer)
-        layer = layer.preLayer.asInstanceOf[ForwardLayer]
+      layer.update(learningRate)
+      if (layer.previous != inputLayer)
+        layer = layer.previous.asInstanceOf[ForwardLayer]
       else
         layer = null
     }

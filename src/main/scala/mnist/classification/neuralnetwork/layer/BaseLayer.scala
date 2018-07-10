@@ -1,4 +1,4 @@
-package mnist.classification.neuralnetwork
+package mnist.classification.neuralnetwork.layer
 
 import breeze.linalg.DenseMatrix
 
@@ -8,5 +8,5 @@ trait BaseLayer {
   def out: DenseMatrix[Double]
   var a: DenseMatrix[Double]
 
-  var nextLayer: ForwardLayer = _
+  var next: ForwardLayer = _
 }

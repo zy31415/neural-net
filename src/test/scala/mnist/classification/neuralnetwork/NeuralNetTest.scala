@@ -1,19 +1,25 @@
 package mnist.classification.neuralnetwork
 
-import breeze.linalg.DenseMatrix
-import mnist.data.MyMnistReader
+import breeze.linalg.{DenseMatrix, argmax}
+import mnist.classification.neuralnetwork.layer.ForwardLayer
+import mnist.data.{MnistImage, MyMnistReader}
 import org.scalatest.FunSuite
 
 import scala.collection.mutable.ListBuffer
 
 class NeuralNetTest extends FunSuite {
   test("test") {
-    val neuralNets = new NeuralNet()
+
+    ForwardLayer.isRandomInitialization = true
+
+    val neuralNets = new NeuralNet(
+      Array(MnistImage.numPixels, 100, 30, 15, 10),
+      learningRate = 0.01,
+      ifRandomShuffle = true
+    )
 
     val data = MyMnistReader.trainImageData
     val labels = MyMnistReader.trainLabels
-
-    neuralNets.build()
 
     neuralNets.train(
       convertData(data),
@@ -22,11 +28,21 @@ class NeuralNetTest extends FunSuite {
 
     val testData = MyMnistReader.testImageData
     val testLabels = MyMnistReader.testLabels
+    val numTestSamples = testLabels.length
 
-    for (d <- convertData(testData)) {
+    var correctPrediction = 0
+
+    for ((d, l) <- convertData(testData) zip testLabels) {
       neuralNets.inputLayer.in = d
-      println(neuralNets.outputLayer.out.t)
+      val out = neuralNets.outputLayer.out.toDenseVector
+
+      if (l == argmax(out))
+        correctPrediction += 1
     }
+
+    val rate = 1.0 * correctPrediction / numTestSamples
+
+    println(s"Correct Rate:$rate ($correctPrediction/$numTestSamples)")
   }
 
   def convertData(data: Array[Array[Int]]): List[DenseMatrix[Double]] = {
@@ -46,5 +62,25 @@ class NeuralNetTest extends FunSuite {
       results.append(out)
     }
     results.toList
+  }
+
+  test("neuralnets creation") {
+    ForwardLayer.isRandomInitialization = false
+    val neuralNet = new NeuralNet(Array(2, 1))
+
+    val Xs = List(
+      new DenseMatrix(2, 1, Array(1.0, 1.0)),
+      new DenseMatrix(2, 1, Array(-1.0, -1.0))
+    )
+
+    val Ys = List(
+      new DenseMatrix[Double](1,1, Array(1.0)),
+      new DenseMatrix[Double](1,1, Array(-1.0))
+    )
+
+    neuralNet.train(Xs, Ys)
+
+    println(neuralNet)
+
   }
 }

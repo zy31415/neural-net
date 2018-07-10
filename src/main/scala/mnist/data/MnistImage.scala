@@ -18,7 +18,7 @@ class MnistImage(val data: Array[Int], val label: Int, val index0: Int, val inde
   override def toString: String = {
     val builder = new StringBuilder
     builder ++= "=" * 2 * MnistImage.ImageWidth += '\n'
-    builder ++= s"MNIST Index: $index0, Data Index: $index1\n"
+    builder ++= s"Label: $label, MNIST Index: $index0, Data Index: $index1\n"
     builder ++= "-" * 2 * MnistImage.ImageWidth += '\n'
     builder ++= MnistImage.charPlot(data)
     builder ++= "=" * 2 * MnistImage.ImageWidth += '\n'

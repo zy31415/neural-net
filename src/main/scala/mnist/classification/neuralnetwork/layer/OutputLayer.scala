@@ -1,9 +1,9 @@
-package mnist.classification.neuralnetwork
+package mnist.classification.neuralnetwork.layer
 
 import breeze.linalg.DenseMatrix
 
 class OutputLayer(preLayer: BaseLayer, numNodes: Int) extends ForwardLayer (preLayer, numNodes) {
-  nextLayer = null
+  next = null
   var y: DenseMatrix[Double] = _
-  override def delta() = (a - y) *:* z.map(activation.d)
+  override def delta = (a - y) *:* z.map(activation.d)
 }
