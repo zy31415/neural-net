@@ -1,3 +1,4 @@
+
 name := "mnist"
 
 version := "0.1"
@@ -14,4 +15,10 @@ libraryDependencies += "org.scalanlp" %% "breeze" % "0.13.2"
 
 // https://mvnrepository.com/artifact/com.github.fommil.netlib/all
 libraryDependencies += "com.github.fommil.netlib" % "all" % "1.1.2" pomOnly()
+
+unmanagedBase := new File("/Applications/HDFView.app/Contents/MacOS")
+
+unmanagedBase := new File("/Applications/HDFView.app/Contents/Java")
+
+
 

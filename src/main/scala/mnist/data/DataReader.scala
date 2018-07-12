@@ -7,7 +7,7 @@ import scala.collection.mutable.ListBuffer
 object DataReader {
   val datafile = getClass.getResource("/data.h5").getPath
 
-  private var testFile: FileFormat = _
+  private var hdf5File: FileFormat = _
 
   private var _imageData: Array[Array[Int]] = _
   private var _labels: Array[Int] = _
@@ -16,7 +16,7 @@ object DataReader {
   def getAllImageDataAsMatrix(): Array[Array[Int]] = {
     if (_imageData == null) {
       open()
-      val dataset = testFile.get("/Data/Image Data").asInstanceOf[Dataset]
+      val dataset = hdf5File.get("/Data/Image Data").asInstanceOf[Dataset]
       assert(dataset != null)
       // Lazy initialization
       dataset.init()
@@ -30,7 +30,7 @@ object DataReader {
 
   def getImage(index: Int): MnistImage = {
     open()
-    val dataset = testFile.get("/Data/Image Data").asInstanceOf[Dataset]
+    val dataset = hdf5File.get("/Data/Image Data").asInstanceOf[Dataset]
     assert(dataset != null)
 
     // Lazy initialization
@@ -51,7 +51,7 @@ object DataReader {
   def getAllLabels(): Array[Int] = {
     if (_labels == null) {
       open()
-      val dataset = testFile.get("/Data/labels").asInstanceOf[Dataset]
+      val dataset = hdf5File.get("/Data/labels").asInstanceOf[Dataset]
       assert(dataset != null)
       val results = dataset.getData
       close()
@@ -63,7 +63,7 @@ object DataReader {
   def getAllIndices(): Array[Int] = {
     if (_indices == null) {
       open()
-      val dataset = testFile.get("/Data/indices").asInstanceOf[Dataset]
+      val dataset = hdf5File.get("/Data/indices").asInstanceOf[Dataset]
       assert(dataset != null)
       val results = dataset.getData
       close()
@@ -74,11 +74,11 @@ object DataReader {
 
   private def open():Int = {
     val fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5)
-    testFile = fileFormat.createInstance(datafile, FileFormat.READ)
-    testFile.open
+    hdf5File = fileFormat.createInstance(datafile, FileFormat.READ)
+    hdf5File.open
   }
 
-  private def close(): Unit = testFile.close()
+  private def close(): Unit = hdf5File.close()
 
   def getImageDataByLabel(label: Int) = {
     val imageData = getAllImageDataAsMatrix()

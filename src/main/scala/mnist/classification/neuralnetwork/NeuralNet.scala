@@ -3,18 +3,30 @@ package mnist.classification.neuralnetwork
 import breeze.linalg.{DenseMatrix, shuffle}
 import mnist.classification.neuralnetwork.layer._
 
-class NeuralNet(sizes: Array[Int],
-               val ifRandomShuffle: Boolean = true,
-               val learningRate: Double = 0.1,
-                val miniBatchSize: Int = 100) {
+class NeuralNet(val sizes: Array[Int],
+                val ifRandomShuffle: Boolean = true,
+                val learningRate: Double = 0.1,
+                val miniBatchSize: Int = 100,
+                weights: Array[DenseMatrix[Double]] = null,
+                biases: Array[DenseMatrix[Double]] = null) {
 
   val inputLayer = new InputLayer(sizes(0))
 
   val outputLayer = {
     var preLayer:BaseLayer = inputLayer
-    for (nth <- 1 until sizes.length -1)
-      preLayer = new HiddenLayer(preLayer, sizes(nth))
-    new OutputLayer(preLayer, sizes.last)
+
+    assert(sizes.length - 1 == weights.length && sizes.length - 1 == biases.length)
+
+    var weight = if (weights == null) null else weights.head
+    var bias = if (biases == null) null else biases.head
+
+    for (nth <- 1 until sizes.length -1) {
+      preLayer = new HiddenLayer(preLayer, sizes(nth), weight, bias)
+      if (weight != null) weight = weights(nth)
+      if (bias != null) bias = biases(nth)
+    }
+
+    new OutputLayer(preLayer, sizes.last, weights.last, biases.last)
   }
 
   def train(Xs: List[DenseMatrix[Double]], Ys: List[DenseMatrix[Double]]): Unit = {
@@ -38,6 +50,10 @@ class NeuralNet(sizes: Array[Int],
       if (count % miniBatchSize == 0)
         update()
     }
+
+    if (outputLayer.C_ws.nonEmpty)
+      update()
+
   }
 
   private def backPropagate(): Unit = {

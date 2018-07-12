@@ -4,29 +4,36 @@ import breeze.linalg.DenseMatrix
 
 import scala.collection.mutable.ListBuffer
 
-abstract class ForwardLayer (val previous: BaseLayer, override val numNodes: Int) extends BaseLayer {
+abstract class ForwardLayer (val previous: BaseLayer,
+                             override val numNodes: Int,
+                             var weight: DenseMatrix[Double] = null,
+                             var bias: DenseMatrix[Double] = null) extends BaseLayer {
   val activation: ActivationFunction = new SigmoidFunction()
 
   previous.next = this
 
-  val weights =
-    if (ForwardLayer.isRandomInitialization)
-      DenseMatrix.rand(numNodes, previous.numNodes, breeze.stats.distributions.Gaussian(0, 1))
-    else
-      DenseMatrix.zeros[Double](numNodes, previous.numNodes)
+  if (weight != null) {
+    assert(weight.rows == numNodes)
+    assert(weight.cols == previous.numNodes)
+  } else if (ForwardLayer.isRandomInitialization)
+    DenseMatrix.rand(numNodes, previous.numNodes, breeze.stats.distributions.Gaussian(0, 1))
+  else
+    DenseMatrix.zeros[Double](numNodes, previous.numNodes)
 
-  val bias =
-    if (ForwardLayer.isRandomInitialization)
-      DenseMatrix.rand(numNodes, 1, breeze.stats.distributions.Gaussian(0, 1))
-    else
-      DenseMatrix.zeros[Double](numNodes, 1)
+  if (bias != null) {
+    assert(bias.rows == numNodes)
+    assert(bias.cols == 1)
+  } else if (ForwardLayer.isRandomInitialization)
+    DenseMatrix.rand(numNodes, 1, breeze.stats.distributions.Gaussian(0, 1))
+  else
+    DenseMatrix.zeros[Double](numNodes, 1)
 
   var z: DenseMatrix[Double] = _
   var a: DenseMatrix[Double] = _
 
   def in = previous.out
   def out = {
-    z = weights * in + bias
+    z = weight * in + bias
     a = z.map(activation(_))
     a
   }
@@ -52,7 +59,7 @@ abstract class ForwardLayer (val previous: BaseLayer, override val numNodes: Int
   }
 
   def update(rho: Double):Unit = {
-    weights -= rho * ForwardLayer.average(C_ws.toList)
+    weight -= rho * ForwardLayer.average(C_ws.toList)
     bias -= rho * ForwardLayer.average(C_bs.toList)
 
     C_ws.clear()
@@ -61,18 +68,18 @@ abstract class ForwardLayer (val previous: BaseLayer, override val numNodes: Int
 }
 
 object ForwardLayer {
+  // TODO: Change this to control weights and biases separately
   var isRandomInitialization = true
 
   def average(list: List[DenseMatrix[Double]]): DenseMatrix[Double] = {
-    var result: DenseMatrix[Double] = null
 
-    for (a <- list) {
-      if(result == null)
-        result = a
-      else
-        result += a
-    }
-    result /:/ list.length.toDouble
+    var result = DenseMatrix.zeros[Double](list.head.rows, list.head.cols)
+    val size = list.length.toDouble
+
+    for (a <- list)
+      result += a/size
+
+    result
   }
 }
 
