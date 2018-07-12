@@ -1,14 +1,16 @@
 package mnist.classification.neuralnetwork
 
-import breeze.linalg.{DenseMatrix, shuffle}
+import breeze.linalg.{DenseMatrix, DenseVector, argmax, shuffle}
 import mnist.classification.neuralnetwork.layer._
+
+import scala.collection.mutable.ArrayBuffer
 
 class NeuralNet(val sizes: Array[Int],
                 val ifRandomShuffle: Boolean = true,
                 val learningRate: Double = 0.1,
                 val miniBatchSize: Int = 100,
                 weights: Array[DenseMatrix[Double]] = null,
-                biases: Array[DenseMatrix[Double]] = null) {
+                biases: Array[DenseVector[Double]] = null) {
 
   val inputLayer = new InputLayer(sizes(0))
 
@@ -29,31 +31,34 @@ class NeuralNet(val sizes: Array[Int],
     new OutputLayer(preLayer, sizes.last, weights.last, biases.last)
   }
 
-  def train(Xs: List[DenseMatrix[Double]], Ys: List[DenseMatrix[Double]]): Unit = {
 
-    val numSamples = Xs.length
-    assert(numSamples == Ys.length)
+  def train(samplePairs: Array[(DenseVector[Double], DenseVector[Double])], numEpochs: Int): Unit = {
+    val numSamples = samplePairs.length
 
-    val order =
-      if (ifRandomShuffle)
-        shuffle(0 until numSamples)
-      else
-        0 until numSamples
+    for (ithEpoch <- 0 until numEpochs) {
+      val order =
+        if (ifRandomShuffle)
+          shuffle(0 until numSamples)
+        else
+          0 until numSamples
 
-    for ((nth, count) <- order.zipWithIndex) {
-      inputLayer.in = Xs(nth)
-      outputLayer.y = Ys(nth)
-      // Forwarding calculation
-      outputLayer.out
-      // train
-      backPropagate()
-      if (count % miniBatchSize == 0)
+      for ((nth, count) <- order.zipWithIndex) {
+        val (in, y) = samplePairs(nth)
+        inputLayer.in = in
+        outputLayer.y = y
+
+        // Forwarding calculation
+        outputLayer.out
+
+        // backward propagation
+        backPropagate()
+        if (count % miniBatchSize == 0)
+          update()
+      }
+
+      if (outputLayer.C_ws.nonEmpty)
         update()
     }
-
-    if (outputLayer.C_ws.nonEmpty)
-      update()
-
   }
 
   private def backPropagate(): Unit = {
@@ -79,4 +84,44 @@ class NeuralNet(val sizes: Array[Int],
         layer = null
     }
   }
+
+  def train(X: DenseMatrix[Double], Y: DenseMatrix[Double], numEpoch: Int): Unit = {
+    assert(X.rows ==  Y.rows)
+
+    val pairs = ArrayBuffer[(DenseVector[Double], DenseVector[Double])]()
+
+    for(i <- 0 until X.cols) {
+      pairs += ((X(i, ::).t, Y(i, ::).t))
+    }
+    train(pairs.toArray, numEpoch)
+  }
+
+  def train(Xs: Array[DenseVector[Double]], Ys: Array[DenseVector[Double]], numEpoch: Int): Unit = {
+    // Assert shape
+    assert(Xs.length == Ys.length)
+    Xs.foreach(i => assert(i.length == Xs(0).length))
+    Ys.foreach(i => assert(i.length == Ys(0).length))
+
+    val pairs = ArrayBuffer[(DenseVector[Double], DenseVector[Double])]()
+    for ((x, y) <- Xs zip Ys)
+      pairs.append((x,y))
+
+    train(pairs.toArray, numEpoch)
+  }
+
+  def evaluate(X: DenseMatrix[Double], Y: DenseVector[Int]): Unit = {
+    assert(X.rows == Y.length)
+    val numSamples = X.rows
+
+    var correct = 0
+
+    for (ith <- 0 until numSamples) {
+      inputLayer.in = X(ith, ::).t
+
+      if (argmax(outputLayer.out) == Y.data(ith))
+        correct += 1
+    }
+    println(s"$correct / $numSamples")
+  }
+
 }

@@ -1,12 +1,12 @@
 package mnist.classification.neuralnetwork.layer
 
-import breeze.linalg.DenseMatrix
+import breeze.linalg.DenseVector
 
 trait BaseLayer {
   val numNodes: Int
-  def in: DenseMatrix[Double]
-  def out: DenseMatrix[Double]
-  var a: DenseMatrix[Double]
+  def in: DenseVector[Double]
+  def out: DenseVector[Double]
+  var a: DenseVector[Double]
 
   var next: ForwardLayer = _
 }

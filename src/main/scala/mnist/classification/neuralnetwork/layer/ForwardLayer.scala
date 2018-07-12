@@ -1,13 +1,13 @@
 package mnist.classification.neuralnetwork.layer
 
-import breeze.linalg.DenseMatrix
+import breeze.linalg.{DenseMatrix, DenseVector}
 
 import scala.collection.mutable.ListBuffer
 
 abstract class ForwardLayer (val previous: BaseLayer,
                              override val numNodes: Int,
                              var weight: DenseMatrix[Double] = null,
-                             var bias: DenseMatrix[Double] = null) extends BaseLayer {
+                             var bias: DenseVector[Double] = null) extends BaseLayer {
   val activation: ActivationFunction = new SigmoidFunction()
 
   previous.next = this
@@ -21,15 +21,15 @@ abstract class ForwardLayer (val previous: BaseLayer,
     DenseMatrix.zeros[Double](numNodes, previous.numNodes)
 
   if (bias != null) {
-    assert(bias.rows == numNodes)
-    assert(bias.cols == 1)
+    assert(bias.length == numNodes)
+
   } else if (ForwardLayer.isRandomInitialization)
     DenseMatrix.rand(numNodes, 1, breeze.stats.distributions.Gaussian(0, 1))
   else
     DenseMatrix.zeros[Double](numNodes, 1)
 
-  var z: DenseMatrix[Double] = _
-  var a: DenseMatrix[Double] = _
+  var z: DenseVector[Double] = _
+  var a: DenseVector[Double] = _
 
   def in = previous.out
   def out = {
@@ -39,18 +39,18 @@ abstract class ForwardLayer (val previous: BaseLayer,
   }
 
   val C_ws = ListBuffer[DenseMatrix[Double]]()
-  val C_bs = ListBuffer[DenseMatrix[Double]]()
+  val C_bs = ListBuffer[DenseVector[Double]]()
 
   /**
     * Store calculated delta.
     */
-  var _delta : DenseMatrix[Double] = _
+  var _delta : DenseVector[Double] = _
 
   /**
     * Method to calculate delta.
     * @return
     */
-  def delta: DenseMatrix[Double]
+  def delta: DenseVector[Double]
 
   def backPropagate(): Unit = {
     _delta = delta
@@ -59,8 +59,8 @@ abstract class ForwardLayer (val previous: BaseLayer,
   }
 
   def update(rho: Double):Unit = {
-    weight -= rho * ForwardLayer.average(C_ws.toList)
-    bias -= rho * ForwardLayer.average(C_bs.toList)
+    weight -= rho * ForwardLayer.averageMat(C_ws.toList)
+    bias -= rho * ForwardLayer.averageVec(C_bs.toList)
 
     C_ws.clear()
     C_bs.clear()
@@ -71,7 +71,18 @@ object ForwardLayer {
   // TODO: Change this to control weights and biases separately
   var isRandomInitialization = true
 
-  def average(list: List[DenseMatrix[Double]]): DenseMatrix[Double] = {
+  def averageVec(list: List[DenseVector[Double]]): DenseVector[Double] = {
+
+    var result = DenseVector.zeros[Double](list.head.length)
+    val size = list.length.toDouble
+
+    for (a <- list)
+      result += a/size
+
+    result
+  }
+
+  def averageMat(list: List[DenseMatrix[Double]]): DenseMatrix[Double] = {
 
     var result = DenseMatrix.zeros[Double](list.head.rows, list.head.cols)
     val size = list.length.toDouble

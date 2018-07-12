@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 
 class ForwardLayerTest extends FunSuite {
   test("test average") {
-    val x = ForwardLayer.average(
+    val x = ForwardLayer.averageMat(
       List(
         DenseMatrix.ones[Double](3, 2),
         DenseMatrix.ones[Double](3, 2) * 2.0
