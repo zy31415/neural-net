@@ -35,6 +35,8 @@ class NeuralNet(val sizes: Array[Int],
   def train(samplePairs: Array[(DenseVector[Double], DenseVector[Double])], numEpochs: Int): Unit = {
     val numSamples = samplePairs.length
 
+    println("Number of samples: %d".format(numSamples))
+
     for (ithEpoch <- 0 until numEpochs) {
       val order =
         if (ifRandomShuffle)
@@ -44,6 +46,9 @@ class NeuralNet(val sizes: Array[Int],
 
       for ((nth, count) <- order.zipWithIndex) {
         val (in, y) = samplePairs(nth)
+
+//        Utils.printChar(in, y)
+
         inputLayer.in = in
         outputLayer.y = y
 
@@ -90,7 +95,7 @@ class NeuralNet(val sizes: Array[Int],
 
     val pairs = ArrayBuffer[(DenseVector[Double], DenseVector[Double])]()
 
-    for(i <- 0 until X.cols) {
+    for(i <- 0 until X.rows) {
       pairs += ((X(i, ::).t, Y(i, ::).t))
     }
     train(pairs.toArray, numEpoch)

@@ -3,7 +3,8 @@ package mnist.classification.neuralnetwork
 import breeze.linalg.{DenseMatrix, DenseVector, Transpose, argmax}
 import hdf.`object`.{Dataset, FileFormat}
 import mnist.classification.neuralnetwork.layer.ForwardLayer
-import mnist.data.{MnistImage, MyMnistReader, Utils}
+import mnist.data.{MnistImage, MyMnistReader, Utils => dataUtils}
+
 import org.scalatest.FunSuite
 
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -60,7 +61,7 @@ class NeuralNetTest extends FunSuite {
     val results = ArrayBuffer[DenseVector[Double]]()
 
     for (l <- labels) {
-      results.append(Utils.labelEncoder(l, 10))
+      results.append(dataUtils.labelEncoder(l, 10))
     }
     results.toArray
   }
@@ -134,8 +135,8 @@ class NeuralNetTest extends FunSuite {
       biases = biases
     )
 
-    val imageData = readTrainImageData
-    val labels = readTrainLabelData
+    val imageData = readTrainImageData(0 until 500, ::)
+    val labels = readTrainLabelData(0 until 500, ::)
 
     val testImageData = readTestImageData
     val testLabelData = readTestLabelData
@@ -144,35 +145,48 @@ class NeuralNetTest extends FunSuite {
 
     neuralNets.evaluate(testImageData, testLabelData)
 
-
   }
 
   val initDatafile = "/Users/zy/Documents/workspace/neural-networks-and-deep-learning/workspace/init.h5"
 
   private def readWeights() =
-    Array(readDataset(initDatafile, "/init/weights/layer1").asInstanceOf[DenseMatrix[Double]],
-      readDataset(initDatafile, "/init/weights/layer2").asInstanceOf[DenseMatrix[Double]])
+    Array(readDataset(initDatafile, "/init/weights/layer1"),
+      readDataset(initDatafile, "/init/weights/layer2"))
 
   private def readBiases() =
-    Array(readDataset(initDatafile, "/init/biases/layer1").asInstanceOf[DenseMatrix[Double]](::,0),
-      readDataset(initDatafile, "/init/biases/layer2").asInstanceOf[DenseMatrix[Double]](::,0))
+    Array(readDataset(initDatafile, "/init/biases/layer1")(::, 0),
+      readDataset(initDatafile, "/init/biases/layer2")(::, 0))
 
   val datafile = "/Users/zy/Documents/workspace/neural-networks-and-deep-learning/workspace/dataset.h5"
 
-  private def readTrainImageData =
-    readDataset(datafile, "/training/images").asInstanceOf[DenseMatrix[Double]]
+  private def readTrainImageData = readDataset(datafile, "/training/images")
 
-  private def readTrainLabelData =
-    readDataset(datafile, "/training/labels").asInstanceOf[DenseMatrix[Double]]
+  private def readTrainLabelData = readDataset(datafile, "/training/labels")
 
-  private def readTestImageData =
-    readDataset(datafile, "/testing/images").asInstanceOf[DenseMatrix[Double]]
+  private def readTestImageData = readDataset(datafile, "/testing/images")
 
-  private def readTestLabelData =
-    readDataset(datafile, "/testing/labels").asInstanceOf[DenseVector[Int]]
+  private def readTestLabelData ={
+    val fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5)
+    val hdf5File = fileFormat.createInstance(datafile, FileFormat.READ)
+    hdf5File.open
+
+    val dataset = hdf5File.get("/testing/labels").asInstanceOf[Dataset]
+    dataset.init()
+
+    val data = dataset.getData
+
+    val dims = dataset.getDims
+
+    if (dims.length == 2) {
+      val result = data.asInstanceOf[Array[Long]].map(_.toInt)
+      hdf5File.close()
+      DenseVector(result)
+    } else {
+      throw new IllegalAccessError()
+    }
+  }
 
   private def readDataset(datafile: String, path: String) = {
-//    val datafile = "/Users/zy/Documents/workspace/neural-networks-and-deep-learning/workspace/init.h5"
     val fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5)
     val hdf5File = fileFormat.createInstance(datafile, FileFormat.READ)
     hdf5File.open
@@ -183,30 +197,20 @@ class NeuralNetTest extends FunSuite {
 
     val dims = dataset.getDims
 
-    dims.foreach(a => print(s"$a "))
-    println("")
-
-    /* TODO: This is a hell. Fix this.
-     1. Why some times 3 dimension, sometimes, 2 dimensions and sometimes 1 dimension?
-     2. How to handle different datatype casting?
-      */
-    if (dims.length >= 2) {
-      val numRow = dataset.getDims()(0).toInt
-      val numCol = dataset.getDims()(1).toInt
+    if (dims.length == 2) {
+      val dimMinor = dataset.getDims()(0).toInt
+      val dimMajor = dataset.getDims()(1).toInt
 
       val result = data.asInstanceOf[Array[Double]]
 
       hdf5File.close()
 
-      new DenseMatrix(numRow, numCol, result)
-    } else if (dims.length == 1) {
-      val numRow = dataset.getDims()(0).toInt
-
-      val result = data.asInstanceOf[Array[Long]].map(_.toInt)
-
-      hdf5File.close()
-
-      DenseVector(result:_*)
+      /**
+        * Note that hdf5 is row major, but breeze is column major.
+        * Note also that DenseMatrix.t doesn't do hard copy on data.
+        * It keep the reference of the data part.
+        */
+      new DenseMatrix(dimMajor, dimMinor, result).t
     } else {
       throw new IllegalAccessError()
     }
