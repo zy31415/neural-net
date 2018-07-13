@@ -16,7 +16,7 @@ val layer1 = new HiddenLayer(inputLayer, 15)
 val outputLayer = new OutputLayer(layer1, numNodes = 10)
 
 // Forwarding:
-println(outputLayer.out)
+println(outputLayer.activation)
 
 val label = DataReader.getAllLabels()(nth)
 val y = DenseMatrix.zeros[Double](10, 1)

@@ -7,42 +7,50 @@ import scala.collection.mutable.ListBuffer
 abstract class ForwardLayer (val previous: BaseLayer,
                              override val numNodes: Int,
                              weight0: DenseMatrix[Double] = null,
-                             bias0: DenseVector[Double] = null) extends BaseLayer {
-  val activation: ActivationFunction = new SigmoidFunction()
+                             bias0: DenseVector[Double] = null) extends BaseLayer{
+
+  val activationFunction: ActivationFunction = new SigmoidFunction()
 
   previous.next = this
 
-  val weight =
+  val weight: DenseMatrix[Double] =
     if (weight0 != null) {
       assert(weight0.rows == numNodes)
       assert(weight0.cols == previous.numNodes)
 
       // Don't refer to but make a copy of weight0, because weight will be updated.
       weight0.copy
-    } else if (ForwardLayer.isRandomInitialization)
+    } else if (ForwardLayer.isRandomInitializationWeight)
       DenseMatrix.rand(numNodes, previous.numNodes, breeze.stats.distributions.Gaussian(0, 1))
     else
       DenseMatrix.zeros[Double](numNodes, previous.numNodes)
 
-  val bias =
+  val bias: DenseVector[Double] =
     if (bias0 != null) {
       assert(bias0.length == numNodes)
 
       // Don't refer to but make a copy of bias0, because bias will be updated during fitting.
       bias0.copy
-    } else if (ForwardLayer.isRandomInitialization)
-      DenseMatrix.rand(numNodes, 1, breeze.stats.distributions.Gaussian(0, 1))
+    } else if (ForwardLayer.isRandomInitializationBias)
+      DenseVector.rand(numNodes, breeze.stats.distributions.Gaussian(0, 1))
     else
-      DenseMatrix.zeros[Double](numNodes, 1)
+      DenseVector.zeros[Double](numNodes)
 
   var z: DenseVector[Double] = _
-  var a: DenseVector[Double] = _
 
-  def in = previous.out
-  def out = {
-    z = weight * in + bias
-    a = z.map(activation(_))
-    a
+  /**
+    * Store calculated activation.
+    */
+  override var _activation: DenseVector[Double] = _
+
+  /**
+    * Calculate activation and return.
+    * @return activation
+    */
+  override def activation = {
+    z = weight * previous.activation + bias
+    _activation = activationFunction(z)
+    _activation
   }
 
   val C_ws = ListBuffer[DenseMatrix[Double]]()
@@ -61,7 +69,7 @@ abstract class ForwardLayer (val previous: BaseLayer,
 
   def backPropagate(): Unit = {
     _delta = delta
-    C_ws.append(_delta * previous.a.t)
+    C_ws.append(_delta * previous._activation.t)
     C_bs.append(_delta)
   }
 
@@ -75,29 +83,26 @@ abstract class ForwardLayer (val previous: BaseLayer,
 }
 
 object ForwardLayer {
-  // TODO: Change this to control weights and biases separately
-  var isRandomInitialization = true
+  /**
+    * Note that you should always randomize the initialization of initial values of weights and biases.
+    * Reset these to false only for experiment purposes.
+    */
+  var isRandomInitializationWeight = true
+  var isRandomInitializationBias = true
 
+  // TODO: You perhaps could replace the following two functions with one UFunc.
   def averageVec(list: List[DenseVector[Double]]): DenseVector[Double] = {
-
     var result = DenseVector.zeros[Double](list.head.length)
-    val size = list.length.toDouble
-
     for (a <- list)
-      result += a/size
-
-    result
+      result += a
+    result/list.length.toDouble
   }
 
   def averageMat(list: List[DenseMatrix[Double]]): DenseMatrix[Double] = {
-
     var result = DenseMatrix.zeros[Double](list.head.rows, list.head.cols)
-    val size = list.length.toDouble
-
     for (a <- list)
-      result += a/size
-
-    result
+      result += a
+    result/list.length.toDouble
   }
 }
 

@@ -12,7 +12,7 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 class NeuralNetTest extends FunSuite {
   test("test") {
 
-    ForwardLayer.isRandomInitialization = true
+    ForwardLayer.isRandomInitializationWeight = true
 
     val neuralNets = new NeuralNet(
       Array(MnistImage.numPixels, 30, 10),
@@ -26,8 +26,7 @@ class NeuralNetTest extends FunSuite {
 
     neuralNets.train(
       convertData(data),
-      convertLabels(labels),
-      1
+      convertLabels(labels)
     )
 
     val testData = MyMnistReader.testImageData
@@ -38,7 +37,7 @@ class NeuralNetTest extends FunSuite {
 
     for ((d, l) <- convertData(testData) zip testLabels) {
       neuralNets.inputLayer.in = d
-      val out = neuralNets.outputLayer.out.toDenseVector
+      val out = neuralNets.outputLayer.activation.toDenseVector
 
       if (l == argmax(out))
         correctPrediction += 1
@@ -67,7 +66,7 @@ class NeuralNetTest extends FunSuite {
   }
 
   test("neuralnets creation") {
-    ForwardLayer.isRandomInitialization = false
+    ForwardLayer.isRandomInitializationWeight = false
     val neuralNet = new NeuralNet(Array(2, 1))
 
     val Xs = Array(
@@ -80,7 +79,7 @@ class NeuralNetTest extends FunSuite {
       DenseVector(1.0)
     )
 
-    neuralNet.train(Xs, Ys, 1)
+    neuralNet.train(Xs, Ys)
 
     println(neuralNet)
 
@@ -141,13 +140,54 @@ class NeuralNetTest extends FunSuite {
     val testImageData = readTestImageData
     val testLabelData = readTestLabelData
 
-    neuralNets.train(imageData, labels, 1)
-
-    println(neuralNets.outputLayer.weight)
-
+    neuralNets.train(imageData, labels)
     neuralNets.evaluate(testImageData, testLabelData)
-
   }
+
+  test("Neural Net test - repeat 30 times") {
+    val neuralNets = new NeuralNet(
+      Array(784, 30, 10),
+      learningRate = 3.0,
+      ifRandomShuffle = true,
+      miniBatchSize = 10,
+      weights = null,
+      biases = null
+    )
+
+    val imageData = readTrainImageData
+    val labels = readTrainLabelData
+
+    val testImageData = readTestImageData
+    val testLabelData = readTestLabelData
+
+    (0 until 30).foreach(_ => {
+      neuralNets.train(imageData, labels)
+      neuralNets.evaluate(testImageData, testLabelData)
+    })
+  }
+
+  test("Neural Net test - 2 hidden layers") {
+    val neuralNets = new NeuralNet(
+      Array(784, 100, 30, 10),
+      learningRate = 3.0,
+      ifRandomShuffle = true,
+      miniBatchSize = 10,
+      weights = null,
+      biases = null
+    )
+
+    val imageData = readTrainImageData
+    val labels = readTrainLabelData
+
+    val testImageData = readTestImageData
+    val testLabelData = readTestLabelData
+
+    (0 until 30).foreach(_ => {
+      neuralNets.train(imageData, labels)
+      neuralNets.evaluate(testImageData, testLabelData)
+    })
+  }
+
 
   val initDatafile = "/Users/zy/Documents/workspace/neural-networks-and-deep-learning/workspace/init.h5"
 

@@ -42,5 +42,5 @@ val testLabels = MyMnistReader.testLabels
 
 for (d <- convertData(testData)) {
   neuralNets.inputLayer.in = d
-  println(neuralNets.outputLayer.out.t)
+  println(neuralNets.outputLayer.activation.t)
 }

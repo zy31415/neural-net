@@ -7,7 +7,12 @@ class OutputLayer(preLayer: BaseLayer,
                   weight: DenseMatrix[Double] = null,
                   bias: DenseVector[Double] = null
                  ) extends ForwardLayer (preLayer, numNodes, weight, bias) {
+  /**
+    * Calculate output of an input (assigned by InputLayer.in). This will trigger forward calculation.
+    * @return
+    */
+  def out = activation
   next = null
   var y: DenseVector[Double] = _
-  override def delta = (a - y) *:* z.map(activation.d)
+  override def delta = (_activation - y) *:* activationFunction.d(z)
 }

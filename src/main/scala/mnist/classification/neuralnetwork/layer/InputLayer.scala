@@ -1,12 +1,12 @@
 package mnist.classification.neuralnetwork.layer
 
-import breeze.linalg.{DenseMatrix, DenseVector}
+import breeze.linalg.DenseVector
 
-class InputLayer(val numNodes: Int) extends BaseLayer {
+class InputLayer(override val numNodes: Int) extends BaseLayer {
   var in: DenseVector[Double] = _
-  var a: DenseVector[Double] = _
-  def out = {
-    a = in
+  override var _activation: DenseVector[Double] = _
+  override def activation: DenseVector[Double] = {
+    _activation = in
     in
   }
 }

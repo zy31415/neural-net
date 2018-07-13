@@ -7,5 +7,5 @@ class HiddenLayer(previous: BaseLayer,
                   weight: DenseMatrix[Double] = null,
                   bias: DenseVector[Double] = null
                  ) extends ForwardLayer(previous, numNodes, weight0 = weight, bias0 = bias) {
-  override def delta = next.weight.t * next._delta *:* z.map(activation.d(_))
+  override def delta = next.weight.t * next._delta *:* activationFunction.d(z)
 }

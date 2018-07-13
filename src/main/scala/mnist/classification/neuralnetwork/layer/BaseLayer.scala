@@ -4,9 +4,8 @@ import breeze.linalg.DenseVector
 
 trait BaseLayer {
   val numNodes: Int
-  def in: DenseVector[Double]
-  def out: DenseVector[Double]
-  var a: DenseVector[Double]
+  def activation: DenseVector[Double]
+  var _activation: DenseVector[Double]
 
   var next: ForwardLayer = _
 }
