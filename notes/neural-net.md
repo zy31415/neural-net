@@ -15,6 +15,7 @@ Layers: 784, 30, 10
 Layers: 784, 100, 30, 10
 
 ```
+Test Results (Correct Predications / Total):
 9106 / 10000
 9221 / 10000
 9329 / 10000
