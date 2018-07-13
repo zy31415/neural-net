@@ -10,7 +10,7 @@ class MnistReaderTest extends FunSuite{
   test("test MnistReader") {
     val nth = 20000
     val image = MyMnistReader.images(nth)
-    val label = MyMnistReader.labels(nth)
+    val label = MyMnistReader.trainLabels(nth)
     ImageIO.write(image, "png",
       new File(s"number-$label.png"))
   }

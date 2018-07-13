@@ -11,8 +11,8 @@ object GenerateData {
 
   def selectOnesAndFives(outputPath: String): Unit = {
 
-    val imageData = MyMnistReader.imageData
-    val labels = MyMnistReader.labels
+    val imageData = MyMnistReader.trainImageData
+    val labels = MyMnistReader.trainLabels
 
     var nth = 0
     val labelsChoosen = ArrayBuffer[Int]()
