@@ -52,7 +52,7 @@ class NeuralNet(val sizes: Array[Int],
       val (in, y) = samplePairs(nth)
 //        Utils.printChar(in, y)
       inputLayer.in = in
-      outputLayer.y = y
+      outputLayer._y = y
 
       // Forwarding calculation
       outputLayer.activation

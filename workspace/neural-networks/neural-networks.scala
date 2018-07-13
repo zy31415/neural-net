@@ -23,7 +23,7 @@ val y = DenseMatrix.zeros[Double](10, 1)
 y(label, 0) = 1.0
 
 inputLayer.in = inputData
-outputLayer.y = y
+outputLayer._y = y
 
 outputLayer.backPropagate
 layer1.backPropagate

@@ -13,6 +13,10 @@ class OutputLayer(preLayer: BaseLayer,
     */
   def out = activation
   next = null
-  var y: DenseVector[Double] = _
-  override def delta = (_activation - y) *:* activationFunction.d(z)
+
+  var _y: DenseVector[Double] = _
+  def y_= (value:DenseVector[Double]):Unit = _y = value
+  def y = _y
+
+  override def delta = (_activation - _y) *:* activationFunction.d(z)
 }
