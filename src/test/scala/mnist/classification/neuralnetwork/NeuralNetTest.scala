@@ -1,13 +1,12 @@
 package mnist.classification.neuralnetwork
 
-import breeze.linalg.{DenseMatrix, DenseVector, Transpose, argmax}
+import breeze.linalg.{DenseMatrix, DenseVector, argmax}
 import hdf.`object`.{Dataset, FileFormat}
 import mnist.classification.neuralnetwork.layer.ForwardLayer
 import mnist.data.{MnistImage, MyMnistReader, Utils => dataUtils}
-
 import org.scalatest.FunSuite
 
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ArrayBuffer
 
 class NeuralNetTest extends FunSuite {
   test("test") {
@@ -15,14 +14,15 @@ class NeuralNetTest extends FunSuite {
     ForwardLayer.isRandomInitializationWeight = true
 
     val neuralNets = new NeuralNet(
-      Array(MnistImage.numPixels, 30, 10),
-      learningRate = 3.0,
-      ifRandomShuffle = true,
-      miniBatchSize = 100
+      Array(MnistImage.numPixels, 30, 10)
     )
 
     val data = MyMnistReader.trainImageData
     val labels = MyMnistReader.trainLabels
+
+    neuralNets.learningRate = 3.0
+    neuralNets.ifRandomShuffle = true
+    neuralNets.miniBatchSize = 100
 
     neuralNets.train(
       convertData(data),
@@ -127,9 +127,6 @@ class NeuralNetTest extends FunSuite {
 
     val neuralNets = new NeuralNet(
       Array(784, 30, 10),
-      learningRate = 3.0,
-      ifRandomShuffle = false,
-      miniBatchSize = 10,
       weights = weights,
       biases = biases
     )
@@ -140,6 +137,10 @@ class NeuralNetTest extends FunSuite {
     val testImageData = readTestImageData
     val testLabelData = readTestLabelData
 
+    neuralNets.learningRate = 3.0
+    neuralNets.miniBatchSize = 10
+    neuralNets.ifRandomShuffle = false
+
     neuralNets.train(imageData, labels)
     neuralNets.evaluate(testImageData, testLabelData)
   }
@@ -147,9 +148,6 @@ class NeuralNetTest extends FunSuite {
   test("Neural Net test - repeat 30 times") {
     val neuralNets = new NeuralNet(
       Array(784, 30, 10),
-      learningRate = 3.0,
-      ifRandomShuffle = true,
-      miniBatchSize = 10,
       weights = null,
       biases = null
     )
@@ -159,6 +157,9 @@ class NeuralNetTest extends FunSuite {
 
     val testImageData = readTestImageData
     val testLabelData = readTestLabelData
+
+    neuralNets.learningRate  = 3.0
+    neuralNets.miniBatchSize = 10
 
     (0 until 30).foreach(_ => {
       neuralNets.train(imageData, labels)
@@ -169,9 +170,6 @@ class NeuralNetTest extends FunSuite {
   test("Neural Net test - 2 hidden layers") {
     val neuralNets = new NeuralNet(
       Array(784, 100, 30, 10),
-      learningRate = 3.0,
-      ifRandomShuffle = true,
-      miniBatchSize = 10,
       weights = null,
       biases = null
     )
@@ -181,6 +179,9 @@ class NeuralNetTest extends FunSuite {
 
     val testImageData = readTestImageData
     val testLabelData = readTestLabelData
+
+    neuralNets.learningRate  = 3.0
+    neuralNets.miniBatchSize = 10
 
     (0 until 30).foreach(_ => {
       neuralNets.train(imageData, labels)

@@ -6,11 +6,20 @@ import mnist.classification.neuralnetwork.layer._
 import scala.collection.mutable.ArrayBuffer
 
 class NeuralNet(val sizes: Array[Int],
-                val ifRandomShuffle: Boolean = true,
-                val learningRate: Double = 0.1,
-                val miniBatchSize: Int = 100,
                 weights: Array[DenseMatrix[Double]] = null,
                 biases: Array[DenseVector[Double]] = null) {
+
+  private var _learningRate = 1.0
+  def learningRate = _learningRate
+  def learningRate_= (value:Double): Unit = _learningRate = value
+
+  private var _miniBatchSize = 1.0
+  def miniBatchSize = _miniBatchSize
+  def miniBatchSize_= (value:Double): Unit = _miniBatchSize = value
+
+  private var _ifRandomShuffle = true
+  def ifRandomShuffle = _ifRandomShuffle
+  def ifRandomShuffle_= (value:Boolean): Unit = _ifRandomShuffle = value
 
   val inputLayer = new InputLayer(sizes(0))
 
@@ -29,12 +38,12 @@ class NeuralNet(val sizes: Array[Int],
     new OutputLayer(preLayer, sizes.last, weight, bias)
   }
 
-
+  
   def train(samplePairs: Array[(DenseVector[Double], DenseVector[Double])]): Unit = {
     val numSamples = samplePairs.length
     println("Number of samples: %d".format(numSamples))
     val order =
-      if (ifRandomShuffle)
+      if (_ifRandomShuffle)
         shuffle(0 until numSamples)
       else
         0 until numSamples
@@ -50,7 +59,7 @@ class NeuralNet(val sizes: Array[Int],
 
       // backward propagation
       backPropagate()
-      if (count % miniBatchSize == 0)
+      if (count % _miniBatchSize == 0)
         update()
     }
 
@@ -75,7 +84,7 @@ class NeuralNet(val sizes: Array[Int],
     var layer:ForwardLayer = outputLayer
 
     while(layer != null) {
-      layer.update(learningRate)
+      layer.update(_learningRate)
       if (layer.previous != inputLayer)
         layer = layer.previous.asInstanceOf[ForwardLayer]
       else
