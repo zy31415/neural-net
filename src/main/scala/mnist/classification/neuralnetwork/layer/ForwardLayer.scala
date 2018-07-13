@@ -6,27 +6,34 @@ import scala.collection.mutable.ListBuffer
 
 abstract class ForwardLayer (val previous: BaseLayer,
                              override val numNodes: Int,
-                             var weight: DenseMatrix[Double] = null,
-                             var bias: DenseVector[Double] = null) extends BaseLayer {
+                             weight0: DenseMatrix[Double] = null,
+                             bias0: DenseVector[Double] = null) extends BaseLayer {
   val activation: ActivationFunction = new SigmoidFunction()
 
   previous.next = this
 
-  if (weight != null) {
-    assert(weight.rows == numNodes)
-    assert(weight.cols == previous.numNodes)
-  } else if (ForwardLayer.isRandomInitialization)
-    DenseMatrix.rand(numNodes, previous.numNodes, breeze.stats.distributions.Gaussian(0, 1))
-  else
-    DenseMatrix.zeros[Double](numNodes, previous.numNodes)
+  val weight =
+    if (weight0 != null) {
+      assert(weight0.rows == numNodes)
+      assert(weight0.cols == previous.numNodes)
 
-  if (bias != null) {
-    assert(bias.length == numNodes)
+      // Don't refer to but make a copy of weight0, because weight will be updated.
+      weight0.copy
+    } else if (ForwardLayer.isRandomInitialization)
+      DenseMatrix.rand(numNodes, previous.numNodes, breeze.stats.distributions.Gaussian(0, 1))
+    else
+      DenseMatrix.zeros[Double](numNodes, previous.numNodes)
 
-  } else if (ForwardLayer.isRandomInitialization)
-    DenseMatrix.rand(numNodes, 1, breeze.stats.distributions.Gaussian(0, 1))
-  else
-    DenseMatrix.zeros[Double](numNodes, 1)
+  val bias =
+    if (bias0 != null) {
+      assert(bias0.length == numNodes)
+
+      // Don't refer to but make a copy of bias0, because bias will be updated during fitting.
+      bias0.copy
+    } else if (ForwardLayer.isRandomInitialization)
+      DenseMatrix.rand(numNodes, 1, breeze.stats.distributions.Gaussian(0, 1))
+    else
+      DenseMatrix.zeros[Double](numNodes, 1)
 
   var z: DenseVector[Double] = _
   var a: DenseVector[Double] = _
@@ -59,8 +66,8 @@ abstract class ForwardLayer (val previous: BaseLayer,
   }
 
   def update(rho: Double):Unit = {
-    weight -= rho * ForwardLayer.averageMat(C_ws.toList)
-    bias -= rho * ForwardLayer.averageVec(C_bs.toList)
+    weight -= (rho * ForwardLayer.averageMat(C_ws.toList))
+    bias -= (rho * ForwardLayer.averageVec(C_bs.toList))
 
     C_ws.clear()
     C_bs.clear()

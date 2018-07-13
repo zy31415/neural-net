@@ -130,18 +130,20 @@ class NeuralNetTest extends FunSuite {
       Array(784, 30, 10),
       learningRate = 3.0,
       ifRandomShuffle = false,
-      miniBatchSize = 1,
+      miniBatchSize = 10,
       weights = weights,
       biases = biases
     )
 
-    val imageData = readTrainImageData(0 until 500, ::)
-    val labels = readTrainLabelData(0 until 500, ::)
+    val imageData = readTrainImageData
+    val labels = readTrainLabelData
 
     val testImageData = readTestImageData
     val testLabelData = readTestLabelData
 
     neuralNets.train(imageData, labels, 1)
+
+    println(neuralNets.outputLayer.weight)
 
     neuralNets.evaluate(testImageData, testLabelData)
 
@@ -159,9 +161,9 @@ class NeuralNetTest extends FunSuite {
 
   val datafile = "/Users/zy/Documents/workspace/neural-networks-and-deep-learning/workspace/dataset.h5"
 
-  private def readTrainImageData = readDataset(datafile, "/training/images")
+  private def readTrainImageData = readDataset(datafile, "/training/images").copy
 
-  private def readTrainLabelData = readDataset(datafile, "/training/labels")
+  private def readTrainLabelData = readDataset(datafile, "/training/labels").copy
 
   private def readTestImageData = readDataset(datafile, "/testing/images")
 
