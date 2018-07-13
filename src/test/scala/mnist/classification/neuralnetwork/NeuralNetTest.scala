@@ -168,6 +168,22 @@ class NeuralNetTest extends FunSuite {
   }
 
   test("Neural Net test - 2 hidden layers") {
+    val neuralNets = new NeuralNet(Array(784, 100, 30, 10))
+
+    val imageData = readTrainImageData
+    val labels = readTrainLabelData
+
+    val testImageData = readTestImageData
+    val testLabelData = readTestLabelData
+
+    neuralNets.learningRate  = 3.0
+    neuralNets.miniBatchSize = 10
+
+    neuralNets.train(imageData, labels)
+    neuralNets.evaluate(testImageData, testLabelData)
+  }
+
+  test("Neural Net test - 2 hidden layers, 30 epochs") {
     val neuralNets = new NeuralNet(
       Array(784, 100, 30, 10),
       weights = null,
